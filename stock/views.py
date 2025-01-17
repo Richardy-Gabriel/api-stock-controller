@@ -74,3 +74,25 @@ def reduce_stock(request, pk):
     return Response({
         "message": "Stock updated successfully", "product": serializers.ProductSerializer(product).data
     })
+
+@api_view(['POST'])
+def increase_stock(request, pk):
+    try:
+        product = models.ProductModel.objects.get(pk=pk)
+    except models.ProductModel.DoesNotExist:
+        return Response({
+            "error": "The product is not registered"
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    quantity_to_increase = request.data.get('quantity', 0)
+
+    if not isinstance(quantity_to_increase, int):
+        return Response({
+            "error: ": "Invalid quantity"
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    product.quantity += quantity_to_increase
+    product.save()
+    return Response({
+        "message": "Stock updated successfully", "product": serializers.ProductSerializer(product).data
+    })
